@@ -6,7 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.demologin.service.TokenService;
-import org.example.demologin.service.UserSevice;
+import org.example.demologin.service.UserService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,11 +19,11 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final TokenService tokenService;
-	private final UserSevice userSevice;
+	private final UserService userService;
 
-	public JwtAuthenticationFilter(TokenService tokenService, UserSevice userSevice) {
+	public JwtAuthenticationFilter(TokenService tokenService, UserService userService) {
 		this.tokenService = tokenService;
-		this.userSevice = userSevice;
+		this.userService = userService;
 	}
 
 	@Override
@@ -40,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			String username = tokenService.decodificarToken(token);
 
 			if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-				UserDetails user = userSevice.loadUserByUsername(username);
+				UserDetails user = userService.loadUserByUsername(username);
 				var authentication = new UsernamePasswordAuthenticationToken(user,null,user.getAuthorities());
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 			}

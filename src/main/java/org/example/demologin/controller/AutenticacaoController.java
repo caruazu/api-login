@@ -1,9 +1,8 @@
 package org.example.demologin.controller;
 
 import org.example.demologin.model.User;
-import org.example.demologin.model.UserRole;
 import org.example.demologin.service.TokenService;
-import org.example.demologin.service.UserSevice;
+import org.example.demologin.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class AutenticacaoController {
 
 	@Autowired
-	private UserSevice userSevice;
+	private UserService userService;
 
 	@Autowired
 	private AuthenticationManager authenticationManager;
@@ -45,7 +44,7 @@ public class AutenticacaoController {
 		try {
 			String password = passwordEncoder.encode(user.getPassword());
 
-			UserDetails userDB = userSevice.cadastrar(
+			UserDetails userDB = userService.cadastrar(
 				user.getUsername(),
 				user.getEmail(),
 				password,

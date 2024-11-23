@@ -34,20 +34,6 @@ public class TokenService {
 		return ZonedDateTime.now(ZoneId.of(fusoHorario)).plusMinutes(minutos).toInstant();
 	}
 
-	public String decodificarToken(String token) {
-		try {
-			return JWT.require(Algorithm.HMAC512(chave))
-					.withIssuer("api-demo-login")
-					.build()
-					.verify(token)
-					.getSubject();
-		} catch (TokenExpiredException e) {
-			throw new RuntimeException("Token expirado", e);
-		} catch (JWTVerificationException e) {
-			throw new RuntimeException("token inválido", e);
-		}
-	}
-
 	public String gerarToken(User user) {
 		try {
 			return JWT.create()
@@ -59,6 +45,20 @@ public class TokenService {
 			throw new RuntimeException(e);
 		} catch (JWTCreationException e) {
 			throw new RuntimeException("erro ao gerar o token JWT", e);
+		}
+	}
+
+	public String decodificarToken(String token) {
+		try {
+			return JWT.require(Algorithm.HMAC512(chave))
+					.withIssuer("api-demo-login")
+					.build()
+					.verify(token)
+					.getSubject();
+		} catch (TokenExpiredException e) {
+			throw new RuntimeException("Token expirado", e);
+		} catch (JWTVerificationException e) {
+			throw new RuntimeException("token inválido", e);
 		}
 	}
 }

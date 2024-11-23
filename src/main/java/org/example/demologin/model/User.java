@@ -23,12 +23,17 @@ public class User implements UserDetails {
 
 	@Column(unique = true)
 	private String username;
+
 	@Column(unique = true)
 	private String email;
-	private String password;
-	private Boolean enabled;
-	private UserRole role;
 
+	private String password;
+
+	private Boolean enabled;
+
+	@Enumerated(EnumType.STRING)
+	@Column(length = 16)
+	private UserRole role;
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
