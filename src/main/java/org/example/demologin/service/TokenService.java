@@ -2,8 +2,10 @@ package org.example.demologin.service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import org.example.demologin.model.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +45,20 @@ public class TokenService {
 			throw new RuntimeException("Token expirado", e);
 		} catch (JWTVerificationException e) {
 			throw new RuntimeException("token inválido", e);
+		}
+	}
+
+	public String gerarToken(User user) {
+		try {
+			return JWT.create()
+					.withIssuer("api-demo-login")
+					.withSubject(user.getUsername())
+					.withExpiresAt(gerarDataExpiracao(expiracaoMinutos))
+					.sign(Algorithm.HMAC512(chave));
+		} catch (IllegalArgumentException e) {
+			throw new RuntimeException(e);
+		} catch (JWTCreationException e) {
+			throw new RuntimeException("erro ao gerar o token JWT", e);
 		}
 	}
 }

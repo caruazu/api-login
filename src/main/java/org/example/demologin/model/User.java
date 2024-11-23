@@ -2,13 +2,15 @@ package org.example.demologin.model;
 
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
@@ -19,6 +21,7 @@ public class User implements UserDetails {
 
 	@Column(unique = true)
 	private String username;
+	@Column(unique = true)
 	private String email;
 	private String password;
 	private Boolean enabled;
@@ -34,5 +37,7 @@ public class User implements UserDetails {
 	public boolean isEnabled() {
 		return enabled;
 	}
+
+
 
 }

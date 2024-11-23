@@ -1,5 +1,6 @@
 package org.example.demologin.config;
 
+import jakarta.annotation.Nullable;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,11 +28,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	@Override
 	protected void doFilterInternal(
-			HttpServletRequest request,
-			HttpServletResponse response,
-			FilterChain filterChain
+			@Nullable HttpServletRequest request,
+			@Nullable HttpServletResponse response,
+			@Nullable FilterChain filterChain
 	) throws ServletException, IOException {
-		String token = this.recoverToken(request);
+		String token = null;
+		if (request != null) {
+			token = this.recoverToken(request);
+		}
 		if (token != null) {
 			String username = tokenService.decodificarToken(token);
 
@@ -41,7 +45,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 			}
 		}
-		filterChain.doFilter(request, response);
+		if (filterChain != null) {
+			filterChain.doFilter(request, response);
+		}
 	}
 
 	private String recoverToken(HttpServletRequest request) {

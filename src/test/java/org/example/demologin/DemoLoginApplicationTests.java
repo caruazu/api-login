@@ -1,0 +1,14 @@
+package org.example.demologin;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class DemoLoginApplicationTests {
+
+	@Test
+	void contextLoads() {
+		System.out.println("testes");
+	}
+
+}
