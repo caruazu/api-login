@@ -1,6 +1,7 @@
 package org.example.demologin.controller;
 
 import org.example.demologin.model.User;
+import org.example.demologin.model.UserRole;
 import org.example.demologin.service.TokenService;
 import org.example.demologin.service.UserSevice;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,10 +44,12 @@ public class AutenticacaoController {
 	{
 		try {
 			String password = passwordEncoder.encode(user.getPassword());
+
 			UserDetails userDB = userSevice.cadastrar(
 				user.getUsername(),
 				user.getEmail(),
-				password
+				password,
+				user.getRole()
 			);
 			return ResponseEntity.ok(userDB);
 		} catch (Exception e) {

@@ -27,6 +27,7 @@ public class SecurityConfig {
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(authorize -> authorize
 						.requestMatchers(HttpMethod.GET, "/public").permitAll()
+						.requestMatchers("/admin/**").hasRole("ADMIN")
 						.requestMatchers("/auth/**").permitAll()
 						.anyRequest()
 						.authenticated()
@@ -42,8 +43,6 @@ public class SecurityConfig {
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
 		return authenticationConfiguration.getAuthenticationManager();
 	}
-
-
 
 	/**
 	 * Define o algoritimo padrao para criptografar senhas
