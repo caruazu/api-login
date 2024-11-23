@@ -2,6 +2,7 @@ package org.example.demologin.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.demologin.model.User;
+import org.example.demologin.model.UserRole;
 import org.example.demologin.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,13 +20,14 @@ public class UserSevice implements UserDetailsService {
 		return userRepository.findByUsername(username);
 	}
 
-	public UserDetails cadastrar(String username, String email, String password) {
+	public UserDetails cadastrar(String username, String email, String password, UserRole role) {
 
 
 		User user = new User();
 		user.setUsername(username);
 		user.setEmail(email);
 		user.setPassword(password);
+		user.setRole(role);
 		user.setEnabled(true);
 
 		User userDB = salvarNoBanco(user);
