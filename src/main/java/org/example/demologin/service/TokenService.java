@@ -34,7 +34,7 @@ public class TokenService {
 		return ZonedDateTime.now(ZoneId.of(fusoHorario)).plusMinutes(minutos).toInstant();
 	}
 
-	public String gerarToken(User user) {
+	public String gerar(User user) {
 		try {
 			return JWT.create()
 					.withIssuer("api-demo-login")
@@ -48,7 +48,7 @@ public class TokenService {
 		}
 	}
 
-	public String decodificarToken(String token) {
+	public String decodificar(String token) {
 		try {
 			return JWT.require(Algorithm.HMAC512(chave))
 					.withIssuer("api-demo-login")

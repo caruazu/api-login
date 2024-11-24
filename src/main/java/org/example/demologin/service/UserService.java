@@ -19,6 +19,9 @@ import java.util.concurrent.ExecutionException;
 @Service
 public class UserService implements UserDetailsService {
 
+	private final TokenService tokenService;
+	private final EmailService emailService;
+
 	@Value("${api.security.login.numero-maximo-tentativas}")
 	private int MAX_ATTEMPTS;
 
@@ -26,7 +29,7 @@ public class UserService implements UserDetailsService {
 	private final HttpServletRequest httpServletRequest;
 	private final LoadingCache<String, Integer> attemptsCache;
 
-	public UserService(UserRepository userRepository, HttpServletRequest httpServletRequest){
+	public UserService(UserRepository userRepository, HttpServletRequest httpServletRequest, TokenService tokenService, EmailService emailService){
 
 		this.userRepository = userRepository;
 		this.httpServletRequest = httpServletRequest;
@@ -34,11 +37,13 @@ public class UserService implements UserDetailsService {
 		attemptsCache = CacheBuilder.newBuilder()
 				.maximumSize(1000)
 				.expireAfterWrite(Duration.ofMinutes(15))
-				.build(new CacheLoader<String, Integer>() {
+				.build(new CacheLoader<>() {
 					public Integer load(String key) {
 						return 0;
 					}
 				});
+		this.tokenService = tokenService;
+		this.emailService = emailService;
 	}
 
 	@Override
@@ -63,13 +68,14 @@ public class UserService implements UserDetailsService {
 		user.setEmail(email);
 		user.setPassword(password);
 		user.setRole(role);
-		user.setEnabled(true);
+		user.setEnabled(false);
 
-		return salvarNoBanco(user);
-	}
+		User userDB = userRepository.save(user);
 
-	private User salvarNoBanco(User user) {
-		return userRepository.save(user);
+		String token = tokenService.gerar(userDB);
+		emailService.enviarConfirmacao(userDB, token);
+
+		return userDB;
 	}
 
 	private String getClientIP() {
@@ -92,5 +98,25 @@ public class UserService implements UserDetailsService {
 		} catch (ExecutionException e) {
 			return false;
 		}
+	}
+
+	public void ativar(String username) {
+		User userDB = (User) userRepository.findByUsername(username);
+		userDB.setEnabled(true);
+		userRepository.save(userDB);
+	}
+
+	public void senhaPedirNova(String username) {
+		User userDB = (User) userRepository.findByUsername(username);
+		if (userDB.isEnabled()) {
+			String token = tokenService.gerar(userDB);
+			emailService.enviarSenhaMudar(userDB, token);
+		}
+	}
+
+	public void senhaMudar(String username, String password) {
+		User userDB = (User) userRepository.findByUsername(username);
+		userDB.setPassword(password);
+		userRepository.save(userDB);
 	}
 }
