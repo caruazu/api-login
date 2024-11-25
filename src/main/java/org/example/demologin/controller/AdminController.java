@@ -10,6 +10,6 @@ public class AdminController {
 
 	@GetMapping
 	public String adminAccess() {
-		return "vc eh admin?";
+		return "você deve ser administrador";
 	}
 }

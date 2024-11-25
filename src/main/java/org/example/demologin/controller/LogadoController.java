@@ -5,11 +5,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("public")
-public class PublicController {
+@RequestMapping("logado")
+public class LogadoController {
 
 	@GetMapping
-	public String adminAccess() {
-		return "você não precisa está logado.";
+	public String userAccess() {
+		return "vc deve está logado.";
 	}
 }
