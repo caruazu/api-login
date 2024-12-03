@@ -14,11 +14,21 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class ControllersExceptionHandler {
+	private Properties errorMensagens;
+
+	public ControllersExceptionHandler() throws IOException {
+		errorMensagens = new Properties();
+		InputStream input = getClass().getClassLoader().getResourceAsStream("ErrorMessages.properties");
+		errorMensagens.load(input);
+	}
 
 	public record FieldErrorDTO(String field,String message) {}
 
@@ -41,14 +51,16 @@ public class ControllersExceptionHandler {
 	@ResponseStatus(HttpStatus.PRECONDITION_FAILED)
 	@ResponseBody
 	public ResponseTemplate TratadorErrors400(HandlerMethodValidationException ex){
-		return new ResponseTemplate("Erro na validação dos dados",ex.getDetailMessageArguments());
+		String errorMessage = errorMensagens.getProperty("error.HandlerMethodValidationException");
+		return new ResponseTemplate(errorMessage,ex.getDetailMessageArguments());
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ResponseBody
 	public ResponseTemplate TratadorErrors400(MethodArgumentNotValidException ex){
-		return new ResponseTemplate("Erro na validação dos dados",getFieldErrorDTOList(ex));
+		String errorMessage = errorMensagens.getProperty("error.MethodArgumentNotValidException");
+		return new ResponseTemplate(errorMessage,getFieldErrorDTOList(ex));
 	}
 
 	@ExceptionHandler(ObjetoNotFoundException.class)
@@ -64,14 +76,16 @@ public class ControllersExceptionHandler {
 	@ResponseStatus(HttpStatus.UNAUTHORIZED)
 	@ResponseBody
 	public ResponseTemplate TratadorErros401BadCredentials(BadCredentialsException ex){
-		return new ResponseTemplate("Senha incorreta",ex.getLocalizedMessage());
+		String errorMessage = errorMensagens.getProperty("error.BadCredentialsException");
+		return new ResponseTemplate(errorMessage,ex.getLocalizedMessage());
 	}
 
 	@ExceptionHandler(AuthenticationException.class)
 	@ResponseStatus(HttpStatus.UNAUTHORIZED)
 	@ResponseBody
 	public ResponseTemplate TratadorErros401Autenticacao(AuthenticationException ex) {
-		return new ResponseTemplate("Falha no processo de autenticação",ex.getLocalizedMessage());
+		String errorMessage = errorMensagens.getProperty("error.AuthenticationException");
+		return new ResponseTemplate(errorMessage,ex.getLocalizedMessage());
 	}
 
 	@ExceptionHandler(UsernameNotFoundException.class)
@@ -84,8 +98,9 @@ public class ControllersExceptionHandler {
 	@ExceptionHandler(UserAlreadyExistsException.class)
 	@ResponseStatus(HttpStatus.CONFLICT)
 	@ResponseBody
-	public ResponseTemplate TratadorErrosUserAlreadyExists(UserAlreadyExistsException ex) {
-		return new ResponseTemplate(ex.getMessage(),null);
+	public ResponseTemplate TratadorErrosUserAlreadyExists() {
+		String errorMessage = errorMensagens.getProperty("error.UserAlreadyExistsException");
+		return new ResponseTemplate(errorMessage,null);
 	}
 
 	@ExceptionHandler({
@@ -96,16 +111,18 @@ public class ControllersExceptionHandler {
 	})
 	@ResponseStatus(HttpStatus.UNAUTHORIZED)
 	@ResponseBody
-	public ResponseTemplate TratadorErrosAccountStatusException(AccountStatusException ex) {
-		return new ResponseTemplate("Usuário está desabilitado",null);
+	public ResponseTemplate TratadorErrosAccountStatusException() {
+		String errorMessage = errorMensagens.getProperty("error.AccountExpiredException");
+		return new ResponseTemplate(errorMessage,null);
 	}
 
 //	Erro geral
 
-//	@ExceptionHandler(Exception.class)
-//	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//	@ResponseBody
-//	public ResponseTemplate TratadorErros500InternalSeverError(Exception e) {
-//		return new ResponseTemplate("Erro no servidor",null);
-//	}
+	@ExceptionHandler(Exception.class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	@ResponseBody
+	public ResponseTemplate TratadorErros500InternalSeverError(Exception e) {
+		String errorMessage = errorMensagens.getProperty("error.Exception");
+		return new ResponseTemplate(errorMessage,null);
+	}
 }

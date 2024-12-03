@@ -30,20 +30,19 @@ public class UserService implements UserDetailsService {
 	private final LoadingCache<String, Integer> attemptsCache;
 
 	public UserService(UserRepository userRepository, HttpServletRequest httpServletRequest, TokenService tokenService, EmailService emailService){
-
 		this.userRepository = userRepository;
 		this.httpServletRequest = httpServletRequest;
-
-		attemptsCache = CacheBuilder.newBuilder()
-				.maximumSize(1000)
-				.expireAfterWrite(Duration.ofMinutes(15))
-				.build(new CacheLoader<>() {
-					public Integer load(String key) {
-						return 0;
-					}
-				});
 		this.tokenService = tokenService;
 		this.emailService = emailService;
+
+		attemptsCache = CacheBuilder.newBuilder()
+			.maximumSize(1000)
+			.expireAfterWrite(Duration.ofMinutes(15))
+			.build(new CacheLoader<>() {
+				public Integer load(String key) {
+					return 0;
+				}
+			});
 	}
 
 	@Override
@@ -64,7 +63,7 @@ public class UserService implements UserDetailsService {
 	public User loadUserByIdAndRole(Long id) {
 		User userDB = (User) userRepository.findByIdAndRole(id,UserRole.USER);
 		if (userDB == null){
-			throw new UsernameNotFoundException("Usuário não existe.");
+			throw new UsernameNotFoundException("Usuario nao existe.");
 		}
 
 		return userDB;
@@ -76,7 +75,7 @@ public class UserService implements UserDetailsService {
 			userRepository.findByUsername(username) != null  ||
 			userRepository.findByEmail(email) != null
 		) {
-			throw new UserAlreadyExistsException("Usuário já existe.");
+			throw new UserAlreadyExistsException("bebe");
 		}
 
 		User user = new User();

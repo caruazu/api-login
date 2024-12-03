@@ -8,7 +8,7 @@ import org.example.demologin.model.validation.ValidSenha;
 public record UserDadosCadastro(
 	@NotBlank
 	String username,
-	@Email
+	@Email @NotBlank
 	String email,
 	@ValidSenha
 	String password,

@@ -34,6 +34,7 @@ public class SecurityConfig {
 				req.requestMatchers(HttpMethod.PUT,"/usuario/{id}").hasRole("ADMIN");
 
 				req.requestMatchers("/auth/**").permitAll();
+				req.requestMatchers("/error").permitAll(); //TODO: remover?
 				req.anyRequest().authenticated();
 			})
 			.addFilterBefore(

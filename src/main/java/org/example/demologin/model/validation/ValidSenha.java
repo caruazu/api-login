@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidSenha {
 
-	String message() default "A senha deve ter no mininimo 12 caracteres, e deve conter uma letra maiuscula, uma letra minuscula e um numero.";
+	String message() default "{valid.campo.senha}";
 
 	Class<?>[] groups() default {};
 
