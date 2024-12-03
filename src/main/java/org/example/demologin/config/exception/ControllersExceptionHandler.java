@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,6 +35,22 @@ public class ControllersExceptionHandler {
 				.collect(Collectors.toList());
 	}
 
+//	Validacao de dados
+
+	@ExceptionHandler(HandlerMethodValidationException.class)
+	@ResponseStatus(HttpStatus.PRECONDITION_FAILED)
+	@ResponseBody
+	public ResponseTemplate TratadorErrors400(HandlerMethodValidationException ex){
+		return new ResponseTemplate("Erro na validação dos dados",ex.getDetailMessageArguments());
+	}
+
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ResponseBody
+	public ResponseTemplate TratadorErrors400(MethodArgumentNotValidException ex){
+		return new ResponseTemplate("Erro na validação dos dados",getFieldErrorDTOList(ex));
+	}
+
 	@ExceptionHandler(ObjetoNotFoundException.class)
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	@ResponseBody
@@ -53,7 +70,7 @@ public class ControllersExceptionHandler {
 	@ExceptionHandler(AuthenticationException.class)
 	@ResponseStatus(HttpStatus.UNAUTHORIZED)
 	@ResponseBody
-	public ResponseTemplate TratadorErros401Autenticação(AuthenticationException ex) {
+	public ResponseTemplate TratadorErros401Autenticacao(AuthenticationException ex) {
 		return new ResponseTemplate("Falha no processo de autenticação",ex.getLocalizedMessage());
 	}
 
@@ -85,10 +102,10 @@ public class ControllersExceptionHandler {
 
 //	Erro geral
 
-	@ExceptionHandler(Exception.class)
-	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	@ResponseBody
-	public ResponseTemplate TratadorErros500InternalSeverError(Exception e) {
-		return new ResponseTemplate("Erro no servidor",null);
-	}
+//	@ExceptionHandler(Exception.class)
+//	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+//	@ResponseBody
+//	public ResponseTemplate TratadorErros500InternalSeverError(Exception e) {
+//		return new ResponseTemplate("Erro no servidor",null);
+//	}
 }

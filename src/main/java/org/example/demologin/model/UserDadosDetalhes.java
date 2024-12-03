@@ -8,10 +8,10 @@ public record UserDadosDetalhes(
 ) {
 	public UserDadosDetalhes(User user) {
 		this(
-				user.getUsername(),
-				user.getEmail(),
-				user.getEnabled(),
-				user.getRole()
+			user.getUsername(),
+			user.getEmail(),
+			user.getEnabled(),
+			user.getRole()
 		);
 	}
 }

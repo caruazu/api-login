@@ -1,9 +1,12 @@
 package org.example.demologin.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import org.example.demologin.config.exception.ResponseTemplate;
 import org.example.demologin.model.User;
+import org.example.demologin.model.UserDadosCadastro;
 import org.example.demologin.model.UserDadosReset;
+import org.example.demologin.model.validation.ValidSenha;
 import org.example.demologin.service.TokenService;
 import org.example.demologin.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -41,19 +45,21 @@ public class AutenticacaoController {
 		return ResponseEntity.ok(responseTemplate);
 	}
 
+	@Transactional
 	@PostMapping("register")
-	public ResponseEntity<?> register(@RequestBody User user){
-		String passwordEncoded = passwordEncoder.encode(user.getPassword());
-		UserDetails userDB = userService.cadastrar(
-			user.getUsername(),
-			user.getEmail(),
-			passwordEncoded,
-			user.getRole()
+	public ResponseEntity<?> register(@Valid @RequestBody UserDadosCadastro user){
+		String passwordEncoded = passwordEncoder.encode(user.password());
+		userService.cadastrar(
+				user.username(),
+				user.email(),
+				passwordEncoded,
+				user.role()
 		);
 
 		return ResponseEntity.ok().build();
 	}
 
+	@Transactional
 	@GetMapping("/validate-email")
 	public ResponseEntity<?> confirmarEmail(@RequestParam("token") String token){
 		String username = tokenService.decodificar(token);
@@ -62,8 +68,9 @@ public class AutenticacaoController {
 		return ResponseEntity.ok().build();
 	}
 
+	@Validated
 	@PostMapping("/forgot-password")
-	public ResponseEntity<?> esqueceuSenha(@RequestParam("username") String username	){
+	public ResponseEntity<?> esqueceuSenha(@NotBlank @RequestParam("username") String username	){
 		userService.senhaPedirNova(username);
 
 		return ResponseEntity.ok().build();

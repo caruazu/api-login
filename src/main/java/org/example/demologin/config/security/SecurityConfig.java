@@ -26,14 +26,16 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 		return httpSecurity.csrf(csrf -> csrf.disable())
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-			.authorizeHttpRequests(authorize -> authorize
-				.requestMatchers(HttpMethod.GET, "/public").permitAll()
-				.requestMatchers("/admin/**").hasRole("ADMIN")
-				.requestMatchers("/user/**").permitAll()
-				.requestMatchers("/auth/**").permitAll()
-				.anyRequest()
-				.authenticated()
-			)
+			.authorizeHttpRequests(req -> {
+				req.requestMatchers(HttpMethod.GET, "/public").permitAll();
+				req.requestMatchers("/admin/**").hasRole("ADMIN");
+
+				req.requestMatchers(HttpMethod.GET,"/usuario/{id}").hasRole("ADMIN");
+				req.requestMatchers(HttpMethod.PUT,"/usuario/{id}").hasRole("ADMIN");
+
+				req.requestMatchers("/auth/**").permitAll();
+				req.anyRequest().authenticated();
+			})
 			.addFilterBefore(
 				jwtAuthenticationFilter,
 				UsernamePasswordAuthenticationFilter.class
