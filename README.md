@@ -52,5 +52,9 @@ Use o [insomnia](https://insomnia.rest/) para importar o arquivo [requests.json]
 ### Funcionalidades futuras
 
 - Validação de senha forte
+- Validação de outros dados
+- Padronização dos erros (http resposne)
+- tratamento de exeções
 - Organização das mensagens
+  - Tratamento de exeções do spring security
 - Documentação automática

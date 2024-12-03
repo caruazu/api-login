@@ -1,4 +1,4 @@
-package org.example.demologin.config;
+package org.example.demologin.config.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
 
 @Configuration
 @EnableWebSecurity
@@ -24,19 +25,29 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 		return httpSecurity.csrf(csrf -> csrf.disable())
-				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authorizeHttpRequests(authorize -> authorize
-						.requestMatchers(HttpMethod.GET, "/public").permitAll()
-						.requestMatchers("/admin/**").hasRole("ADMIN")
-						.requestMatchers("/auth/**").permitAll()
-						.anyRequest()
-						.authenticated()
+			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+			.authorizeHttpRequests(authorize -> authorize
+				.requestMatchers(HttpMethod.GET, "/public").permitAll()
+				.requestMatchers("/admin/**").hasRole("ADMIN")
+				.requestMatchers("/user/**").permitAll()
+				.requestMatchers("/auth/**").permitAll()
+				.anyRequest()
+				.authenticated()
+			)
+			.addFilterBefore(
+				jwtAuthenticationFilter,
+				UsernamePasswordAuthenticationFilter.class
+			)
+			// configurando os headers que pedem ao navegador para não executar código ao retornar dados
+			.headers(header -> header
+				.xssProtection(
+					xss -> xss.headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK)
 				)
-				.addFilterBefore(
-						jwtAuthenticationFilter,
-						UsernamePasswordAuthenticationFilter.class
+				.contentSecurityPolicy(
+					cps -> cps.policyDirectives("script-src 'self'")
 				)
-				.build();
+			)
+			.build();
 	}
 
 	@Bean

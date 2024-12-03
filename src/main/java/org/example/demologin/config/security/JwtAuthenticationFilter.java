@@ -1,4 +1,4 @@
-package org.example.demologin.config;
+package org.example.demologin.config.security;
 
 import jakarta.annotation.Nullable;
 import jakarta.servlet.FilterChain;

@@ -3,6 +3,7 @@ package org.example.demologin.service;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import org.example.demologin.config.exception.error.UserAlreadyExistsException;
 import org.example.demologin.model.User;
 import org.example.demologin.model.UserRole;
 import org.example.demologin.repository.UserRepository;
@@ -19,12 +20,11 @@ import java.util.concurrent.ExecutionException;
 @Service
 public class UserService implements UserDetailsService {
 
-	private final TokenService tokenService;
-	private final EmailService emailService;
-
 	@Value("${api.security.login.numero-maximo-tentativas}")
 	private int MAX_ATTEMPTS;
 
+	private final TokenService tokenService;
+	private final EmailService emailService;
 	private final UserRepository userRepository;
 	private final HttpServletRequest httpServletRequest;
 	private final LoadingCache<String, Integer> attemptsCache;
@@ -61,7 +61,23 @@ public class UserService implements UserDetailsService {
 		return user;
 	}
 
+	public User loadUserByIdAndRole(Long id) {
+		User userDB = (User) userRepository.findByIdAndRole(id,UserRole.USER);
+		if (userDB == null){
+			throw new UsernameNotFoundException("Usuário não existe.");
+		}
+
+		return userDB;
+	}
+
 	public UserDetails cadastrar(String username, String email, String password, UserRole role) {
+
+		if (
+			userRepository.findByUsername(username) != null  ||
+			userRepository.findByEmail(email) != null
+		) {
+			throw new UserAlreadyExistsException("Usuário já existe.");
+		}
 
 		User user = new User();
 		user.setUsername(username);
@@ -101,13 +117,13 @@ public class UserService implements UserDetailsService {
 	}
 
 	public void ativar(String username) {
-		User userDB = (User) userRepository.findByUsername(username);
+		User userDB = (User) loadUserByUsername(username);
 		userDB.setEnabled(true);
 		userRepository.save(userDB);
 	}
 
 	public void senhaPedirNova(String username) {
-		User userDB = (User) userRepository.findByUsername(username);
+		User userDB = (User) loadUserByUsername(username);
 		if (userDB.isEnabled()) {
 			String token = tokenService.gerar(userDB);
 			emailService.enviarSenhaMudar(userDB, token);
@@ -115,8 +131,14 @@ public class UserService implements UserDetailsService {
 	}
 
 	public void senhaMudar(String username, String password) {
-		User userDB = (User) userRepository.findByUsername(username);
+		User userDB = (User) loadUserByUsername(username);
 		userDB.setPassword(password);
+		userRepository.save(userDB);
+	}
+
+	public void desativar(Long id) {
+		User userDB = loadUserByIdAndRole(id);
+		userDB.setEnabled(false);
 		userRepository.save(userDB);
 	}
 }

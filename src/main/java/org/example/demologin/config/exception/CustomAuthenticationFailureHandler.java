@@ -1,4 +1,4 @@
-package org.example.demologin.config;
+package org.example.demologin.config.exception;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
