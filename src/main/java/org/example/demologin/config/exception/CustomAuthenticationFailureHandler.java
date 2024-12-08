@@ -3,7 +3,10 @@ package org.example.demologin.config.exception;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.example.demologin.service.EmailService;
 import org.example.demologin.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
@@ -13,6 +16,7 @@ import java.io.IOException;
 
 @Component
 public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
+	private static final Logger logger = LoggerFactory.getLogger(CustomAuthenticationFailureHandler.class);
 
 	private final MessageSource messageSource;
 	private final HttpServletRequest request;
@@ -22,6 +26,8 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
 		this.messageSource = messageSource;
 		this.request = request;
 		this.userService = userService;
+
+		logger.debug("CustomAuthenticationFailureHandler inicializado.");
 	}
 
 	@Override
@@ -34,14 +40,11 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
 		userService.loginFailed(ipAddress);
 
 		if (userService.isBlocked(ipAddress)) {
+			logger.warn("IP bloqueado devido a múltiplas tentativas de login: {}", ipAddress);
 			String blockedMessage = messageSource.getMessage("Usuário bloqueado por número máximo de tentativas de senha", null, request.getLocale());
-			addErrorMessage(request, response, blockedMessage);
 		} else {
 			super.onAuthenticationFailure(request, response, exception);
 		}
-	}
-
-	private void addErrorMessage(HttpServletRequest request, HttpServletResponse response, String blockedMessage) {
 	}
 
 	private String getClientIP() {

@@ -5,8 +5,11 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.example.demologin.service.EmailService;
 import org.example.demologin.service.TokenService;
 import org.example.demologin.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,12 +21,15 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+	private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+
 	private final TokenService tokenService;
 	private final UserService userService;
 
 	public JwtAuthenticationFilter(TokenService tokenService, UserService userService) {
 		this.tokenService = tokenService;
 		this.userService = userService;
+		logger.debug("JwtAuthenticationFilter iniciado com sucesso.");
 	}
 
 	@Override
@@ -41,8 +47,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 			if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 				UserDetails user = userService.loadUserByUsername(username);
-				var authentication = new UsernamePasswordAuthenticationToken(user,null,user.getAuthorities());
+				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+						user, null, user.getAuthorities());
 				SecurityContextHolder.getContext().setAuthentication(authentication);
+
+				logger.info("Usuário autenticado com sucesso. {}", username);
 			}
 		}
 		if (filterChain != null) {
@@ -53,8 +62,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private String recoverToken(HttpServletRequest request) {
 		String authHeader = request.getHeader("Authorization");
 		if (authHeader != null && authHeader.startsWith("Bearer ")) {
+			logger.debug("Token JWT extraído do cabeçalho Authorization.");
 			return authHeader.replace("Bearer ", "");
 		} else {
+			logger.debug("Cabeçalho Authorization inválido ou não contém um token Bearer.");
 			return null;
 		}
 	}
