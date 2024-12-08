@@ -3,6 +3,7 @@ package org.example.demologin.config.exception;
 import org.example.demologin.config.exception.error.ObjetoNotFoundException;
 import org.example.demologin.config.exception.error.UserAlreadyExistsException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -46,6 +47,15 @@ public class ControllersExceptionHandler {
 	}
 
 //	Validacao de dados
+
+	@ExceptionHandler(HttpMessageNotReadableException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ResponseBody
+	public ResponseTemplate tratadorSemCorpo(HttpMessageNotReadableException ex) {
+		String errorMessage = errorMensagens.getProperty("error.HttpMessageNotReadableException");
+		return new ResponseTemplate(errorMessage,null);
+	}
+
 
 	@ExceptionHandler(HandlerMethodValidationException.class)
 	@ResponseStatus(HttpStatus.PRECONDITION_FAILED)
@@ -123,6 +133,6 @@ public class ControllersExceptionHandler {
 	@ResponseBody
 	public ResponseTemplate TratadorErros500InternalSeverError(Exception e) {
 		String errorMessage = errorMensagens.getProperty("error.Exception");
-		return new ResponseTemplate(errorMessage,null);
+		return new ResponseTemplate(errorMessage,e.getLocalizedMessage());
 	}
 }

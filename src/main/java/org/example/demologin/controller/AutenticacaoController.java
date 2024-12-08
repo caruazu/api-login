@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import org.example.demologin.config.exception.ResponseTemplate;
 import org.example.demologin.model.User;
 import org.example.demologin.model.UserDadosCadastro;
+import org.example.demologin.model.UserDadosLogin;
 import org.example.demologin.model.UserDadosReset;
 import org.example.demologin.model.validation.ValidSenha;
 import org.example.demologin.service.TokenService;
@@ -36,8 +37,8 @@ public class AutenticacaoController {
 	private PasswordEncoder passwordEncoder;
 
 	@PostMapping("/login")
-	public ResponseEntity<?> login(@RequestBody User user) {
-		var tokenAuth = new UsernamePasswordAuthenticationToken(user.getUsername(),user.getPassword());
+	public ResponseEntity<?> login(@RequestBody UserDadosLogin dados) {
+		var tokenAuth = new UsernamePasswordAuthenticationToken(dados.username(),dados.password());
 		var autenticacao = authenticationManager.authenticate(tokenAuth);
 		String token = tokenService.gerar((User) autenticacao.getPrincipal());
 		ResponseTemplate responseTemplate = new ResponseTemplate("login efetuado",token);

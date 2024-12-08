@@ -56,4 +56,7 @@ Use o [insomnia](https://insomnia.rest/) para importar o arquivo [requests.json]
 
 ### Funcionalidades futuras
 
+- testes automatizados
 - Documentação automática
+- Logging
+- Login com o google
