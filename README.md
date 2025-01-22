@@ -52,11 +52,13 @@ Use o [insomnia](https://insomnia.rest/) para importar o arquivo [requests.json]
 - Validação de outros dados
 - Padronização dos erros (http resposne)
 - tratamento de exceções
-- Organização das mensagens
+- Organização das mensagens de erro
+- Logging
+- CORS
 
 ### Funcionalidades futuras
 
 - testes automatizados
 - Documentação automática
-- Logging
 - Login com o google
+- validação de capcha
