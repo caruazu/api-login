@@ -43,6 +43,8 @@ Use o [insomnia](https://insomnia.rest/) para importar o arquivo [requests.json]
 
 ## Funcionalidades
 
+### Implementado
+
 - Autenticação via token JWT
 - Perfis de usuário
 - Número máximo de tentativas de senha até bloqueio temporário
@@ -55,10 +57,10 @@ Use o [insomnia](https://insomnia.rest/) para importar o arquivo [requests.json]
 - Organização das mensagens de erro
 - Logging
 - CORS
+- Validação de capcha
 
-### Funcionalidades futuras
+### Para implementar
 
-- testes automatizados
+- Testes automatizados
 - Documentação automática
 - Login com o google
-- validação de capcha

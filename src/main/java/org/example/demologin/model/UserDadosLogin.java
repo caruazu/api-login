@@ -9,6 +9,8 @@ public record UserDadosLogin(
 	@NotBlank
 	String username,
 	@ValidSenha
-	String password
+	String password,
+	@NotBlank
+	String captcha
 ) {
 }

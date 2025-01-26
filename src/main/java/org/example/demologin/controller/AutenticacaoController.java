@@ -7,14 +7,15 @@ import org.example.demologin.model.User;
 import org.example.demologin.model.UserDadosCadastro;
 import org.example.demologin.model.UserDadosLogin;
 import org.example.demologin.model.UserDadosReset;
-import org.example.demologin.model.validation.ValidSenha;
+import org.example.demologin.service.CaptchaService;
 import org.example.demologin.service.TokenService;
 import org.example.demologin.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -36,8 +37,18 @@ public class AutenticacaoController {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
+	@Autowired
+	private CaptchaService captchaService;
+
+	// TODO: mover essa condicional para o service
 	@PostMapping("/login")
-	public ResponseEntity<?> login(@RequestBody UserDadosLogin dados) {
+	public ResponseEntity<?> login(@RequestBody UserDadosLogin dados) throws AuthenticationException {
+
+		Boolean captchaValido = captchaService.validateCaptcha(dados.captcha());
+		if (!captchaValido) {
+			throw new BadCredentialsException("Captcha Invalido");
+		}
+
 		var tokenAuth = new UsernamePasswordAuthenticationToken(dados.username(),dados.password());
 		var autenticacao = authenticationManager.authenticate(tokenAuth);
 		String token = tokenService.gerar((User) autenticacao.getPrincipal());
