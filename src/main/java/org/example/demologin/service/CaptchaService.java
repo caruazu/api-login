@@ -6,11 +6,10 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
-
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -22,26 +21,23 @@ public class CaptchaService {
 	@Value("${api.security.captcha.host}")
 	private String verifyUrl;
 
-	// TODO: melhorar o tratamento de erro
-	public Boolean validateCaptcha(String recaptchaResponse) {
-		try {
-			MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
-			requestBody.add("secret", secretKey);
-			requestBody.add("response", recaptchaResponse);
+	public void validateCaptcha(String recaptchaResponse) {
 
-			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
+		requestBody.add("secret", secretKey);
+		requestBody.add("response", recaptchaResponse);
 
-			HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-			RestTemplate restTemplate = new RestTemplate();
-			ResponseEntity<CaptchaResponse> responseEntity = restTemplate.postForEntity(verifyUrl, requestEntity, CaptchaResponse.class);
+		HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
 
-			CaptchaResponse response = responseEntity.getBody();
-			return response != null && response.isSuccess();
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<CaptchaResponse> responseEntity = restTemplate.postForEntity(verifyUrl, requestEntity, CaptchaResponse.class);
+
+		CaptchaResponse response = responseEntity.getBody();
+		if(response == null || !response.isSuccess()){
+			throw new BadCredentialsException("CAPTCHA inválido");
 		}
 	}
 }

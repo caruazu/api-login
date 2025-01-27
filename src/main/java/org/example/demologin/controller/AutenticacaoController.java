@@ -40,15 +40,9 @@ public class AutenticacaoController {
 	@Autowired
 	private CaptchaService captchaService;
 
-	// TODO: mover essa condicional para o service
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@RequestBody UserDadosLogin dados) throws AuthenticationException {
-
-		Boolean captchaValido = captchaService.validateCaptcha(dados.captcha());
-		if (!captchaValido) {
-			throw new BadCredentialsException("Captcha Invalido");
-		}
-
+		captchaService.validateCaptcha(dados.captcha());
 		var tokenAuth = new UsernamePasswordAuthenticationToken(dados.username(),dados.password());
 		var autenticacao = authenticationManager.authenticate(tokenAuth);
 		String token = tokenService.gerar((User) autenticacao.getPrincipal());
