@@ -36,7 +36,7 @@ public class CaptchaService {
 		ResponseEntity<CaptchaResponse> responseEntity = restTemplate.postForEntity(verifyUrl, requestEntity, CaptchaResponse.class);
 
 		CaptchaResponse response = responseEntity.getBody();
-		if(response == null || !response.isSuccess()){
+		if(response == null || !response.success()){
 			throw new BadCredentialsException("CAPTCHA inválido");
 		}
 	}
