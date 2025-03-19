@@ -41,6 +41,22 @@ Execute a aplicação:
 
 Use o [insomnia](https://insomnia.rest/) para importar o arquivo [requests.json](src/main/resources/requests/requests.json) em `src/main/resources/requests`. Nele estão as requisições para interagir com o projeto.
 
+#### Docker
+
+```bash
+docker build -t caruazu/api-login .
+```
+
+```bash
+docker run --env-file .env -p 8080:8080 caruazu/api-login
+```
+
+##### localmente
+
+```bash
+docker run --env-file .env --network host caruazu/api-login
+```
+
 ## Funcionalidades
 
 ### Implementado
