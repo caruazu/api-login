@@ -21,23 +21,27 @@ public class CaptchaService {
 	@Value("${api.security.captcha.host}")
 	private String verifyUrl;
 
+	@Value("${api.security.captcha.disable}")
+	private Boolean captchaDisabled;
+
 	public void validateCaptcha(String recaptchaResponse) {
+		if (!captchaDisabled) {
+			MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
+			requestBody.add("secret", secretKey);
+			requestBody.add("response", recaptchaResponse);
 
-		MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
-		requestBody.add("secret", secretKey);
-		requestBody.add("response", recaptchaResponse);
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+			HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
 
-		HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
+			RestTemplate restTemplate = new RestTemplate();
+			ResponseEntity<CaptchaResponse> responseEntity = restTemplate.postForEntity(verifyUrl, requestEntity, CaptchaResponse.class);
 
-		RestTemplate restTemplate = new RestTemplate();
-		ResponseEntity<CaptchaResponse> responseEntity = restTemplate.postForEntity(verifyUrl, requestEntity, CaptchaResponse.class);
-
-		CaptchaResponse response = responseEntity.getBody();
-		if(response == null || !response.success()){
-			throw new BadCredentialsException("CAPTCHA inválido");
+			CaptchaResponse response = responseEntity.getBody();
+			if (response == null || !response.success()) {
+				throw new BadCredentialsException("CAPTCHA inválido");
+			}
 		}
 	}
 }

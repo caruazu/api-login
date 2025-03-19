@@ -73,10 +73,12 @@ docker run --env-file .env --network host caruazu/api-login
 - Organização das mensagens de erro
 - Logging
 - CORS
-- Validação de capcha
+- Validação de CAPTCHA
+- Desativar o CAPTCHA via variavel de ambiente
 
 ### Para implementar
 
+- padronização do erro de token inválido/expirado (java.lang.RuntimeException: Token expirado)
 - Testes automatizados
 - Documentação automática
 - Login com o google
