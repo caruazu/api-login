@@ -43,7 +43,7 @@ docker run --env-file .env --network host caruazu/api-login
 
 #### Sem Docker
 
-Certifique-se que seu ambiente possui as dependências do projeto e que o banco definido em .env já está criado.
+Instale o Maven.
 
 Instale as dependências:
 ```bash
