@@ -3,6 +3,7 @@
 ![Spring Boot](https://img.shields.io/badge/spring-6DB33F?style=for-the-badge&logoColor=white&logo=spring)
 ![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
 ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 
 ## Sobre
 
@@ -12,8 +13,9 @@
 
 Esta aplicação foi construída com:
 
-- linux kernel: 5.15
-- linux Mint: 21
+- Linux kernel: 5.15
+- Docker: 28.0.1
+- Linux Mint: 21
 - Postgres: 12
 - Maven: 3.9
 
@@ -25,9 +27,23 @@ Utilize o arquivo `.env.exemple` como exemplo para suas variáveis locais. Faça
 
 ### Inicialização
 
-Certifique-se que seu ambiente possui as dependências do projeto e que o banco definido em .env já está criado.
+Certifique-se que seu ambiente possui as dependências do projeto e que o banco definido em .env já existe. Há duas opções de rodar o projeto:
 
-Vá até a pasta `sistema-svo-pra-backend`.
+#### Com Docker
+
+Construa o container:
+```bash
+docker build -t caruazu/api-login .
+```
+
+Rode o container:
+```bash
+docker run --env-file .env --network host caruazu/api-login
+```
+
+#### Sem Docker
+
+Certifique-se que seu ambiente possui as dependências do projeto e que o banco definido em .env já está criado.
 
 Instale as dependências:
 ```bash
@@ -37,24 +53,6 @@ Instale as dependências:
 Execute a aplicação:
 ```bash
 ./mvnw spring-boot:run
-```
-
-Use o [insomnia](https://insomnia.rest/) para importar o arquivo [requests.json](src/main/resources/requests/requests.json) em `src/main/resources/requests`. Nele estão as requisições para interagir com o projeto.
-
-#### Docker
-
-```bash
-docker build -t caruazu/api-login .
-```
-
-```bash
-docker run --env-file .env -p 8080:8080 caruazu/api-login
-```
-
-##### localmente
-
-```bash
-docker run --env-file .env --network host caruazu/api-login
 ```
 
 ## Funcionalidades
@@ -74,7 +72,7 @@ docker run --env-file .env --network host caruazu/api-login
 - Logging
 - CORS
 - Validação de CAPTCHA
-- Desativar o CAPTCHA via variavel de ambiente
+- Desativar o CAPTCHA via variável de ambiente
 
 ### Para implementar
 
